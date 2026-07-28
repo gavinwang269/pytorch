@@ -19,7 +19,7 @@ from torch.utils._ordered_set import OrderedSet
 
 
 logger = torch._logging.getArtifactLogger(__name__, "benchmarking")
-GPU_BENCHMARK_DEVICE_TYPES = ("cuda", "xpu", "mtia")
+GPU_BENCHMARK_DEVICE_TYPES = ("cuda", "xpu", "mtia", "npu")
 _CALLABLE_PROFILE_EVENT_NAME = "_CALLABLE"
 
 

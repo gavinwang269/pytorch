@@ -12,7 +12,6 @@ from torch._inductor.compiler_bisector import CompilerBisector
 from torch._inductor.custom_graph_pass import CustomGraphPass
 from torch._inductor.test_case import TestCase
 from torch.library import _scoped_library, Library
-from torch.testing._internal.common_utils import requires_cuda
 from torch.testing._internal.inductor_utils import GPU_TYPE, HAS_GPU
 
 
@@ -339,7 +338,6 @@ class TestCompilerBisector(TestCase):
         self.assertEqual(out.subsystem, "pre_grad_graph")
         self.assertEqual(out.bisect_number, 1)
 
-    @requires_cuda
     def test_cudagraph_bisect_max(self):
         """Test that cudagraph bisector can limit number of cudagraphed graphs."""
         import os

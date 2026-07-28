@@ -170,6 +170,15 @@ class DeviceInterface:
         if not cls.is_triton_capable():
             raise RuntimeError("This device is not capable of supporting Triton")
 
+    @staticmethod
+    def is_gpu() -> bool:
+        """Returns True if Inductor should treat this device as a GPU-class accelerator."""
+        return False
+
+    @classmethod
+    def exposes_streams(cls) -> bool:
+        return cls.Stream is not DeviceInterface.Stream
+
 
 class DeviceGuard:
     """
@@ -292,6 +301,10 @@ class CudaInterface(DeviceInterface):
         elif "nvidia" not in triton.backends.backends:
             raise RuntimeError("triton not built with the 'nvidia' backend")
 
+    @staticmethod
+    def is_gpu() -> bool:
+        return True
+
 
 get_mtia_stream: Callable[[int], int] | None
 if torch.mtia._is_compiled():
@@ -377,6 +390,10 @@ class MtiaInterface(DeviceInterface):
         if "mtia" not in triton.backends.backends:
             raise RuntimeError("triton not built with the 'mtia' backend")
 
+    @staticmethod
+    def is_gpu() -> bool:
+        return True
+
 
 get_xpu_stream: Callable[[int], int] | None
 if torch.xpu._is_compiled():
@@ -452,6 +469,10 @@ class XpuInterface(DeviceInterface):
     @staticmethod
     def is_bf16_supported(including_emulation: bool = False) -> bool:
         return torch.xpu.is_bf16_supported()
+
+    @staticmethod
+    def is_gpu() -> bool:
+        return True
 
     @staticmethod
     def is_triton_capable(device: torch.types.Device = None) -> bool:
@@ -545,6 +566,10 @@ class MpsInterface(DeviceInterface):
     @staticmethod
     def is_available() -> bool:
         return torch.backends.mps.is_available()
+
+    @staticmethod
+    def is_gpu() -> bool:
+        return True
 
     @staticmethod
     def current_device() -> int:

@@ -98,7 +98,24 @@ if TYPE_CHECKING:
     from .scheduler import BaseSchedulerNode, SchedulerBuffer
 
 
-GPU_TYPES = ["cuda", "mps", "xpu", "mtia"]
+class _GpuTypes:
+    """Dynamic GPU type discovery via DeviceInterface.is_gpu()."""
+    def __contains__(self, device):
+        from torch._dynamo.device_interface import get_interface_for_device
+        try:
+            iface = get_interface_for_device(device)
+            return iface is not None and iface.is_gpu()
+        except Exception:
+            return False
+    def __iter__(self):
+        from torch._dynamo.device_interface import device_interfaces
+        for name, iface in device_interfaces.items():
+            if ":" not in name and iface.is_gpu():
+                yield name
+    def __repr__(self):
+        return f"_GpuTypes({list(self)})"
+
+GPU_TYPES = _GpuTypes()
 T = TypeVar("T")
 
 
