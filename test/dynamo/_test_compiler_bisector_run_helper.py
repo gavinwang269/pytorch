@@ -3,10 +3,13 @@ from contextlib import contextmanager
 
 import torch
 import torch._prims_common as utils
-from torch.testing._internal.inductor_utils import GPU_TYPE
 
 
 aten = torch.ops.aten
+
+# Device is passed via environment variable from the parent test process.
+# Falls back to "cuda" for backwards compatibility.
+_DEVICE = os.environ.get("TORCH_TEST_DEVICE", "cuda")
 
 
 def bad_exp_decomp(self, rate=1.0, generator=None):
@@ -49,7 +52,7 @@ def vq(x):
 def test_fn():
     with patch_exp_decomp():
         vq_compiled = torch.compile(vq)
-        x = torch.randn(4, 400, 256, device=GPU_TYPE)
+        x = torch.randn(4, 400, 256, device=_DEVICE)
         out_compiled = vq_compiled(x)
 
     return 1 if out_compiled.isnan().any() else 0
